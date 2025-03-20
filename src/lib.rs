@@ -4,6 +4,8 @@ use std::{collections::HashMap, env};
 
 /// A struct representing parsed command-line arguments.
 ///
+/// #### Example:
+///
 /// ```
 /// # use valargs::Args;
 /// # fn main() {
