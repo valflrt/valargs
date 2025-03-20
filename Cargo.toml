@@ -1,6 +1,9 @@
 [package]
 name = "valargs"
+description = "A simple command-line argument helper for parsing positional arguments and options."
 version = "0.1.0"
+authors = ["valflrt"]
+license = "MIT"
 edition = "2024"
 
 [dependencies]
