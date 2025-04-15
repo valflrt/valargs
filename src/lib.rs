@@ -2,6 +2,22 @@
 /// arguments and options.
 use std::{collections::HashMap, env};
 
+/// Build the `Args` object associated with the arguments
+/// that the program was started with.
+///
+/// ```
+/// # use valargs::Args;
+/// # fn main() {
+/// let args = Args::parse();
+/// if args.has_option("nevergonnaletyoudown") {
+///     println!("got rickrolled");
+/// }
+/// # }
+/// ```
+pub fn parse() -> Args {
+    Args::parse()
+}
+
 /// A struct representing parsed command-line arguments.
 ///
 /// #### Example:
