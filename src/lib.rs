@@ -85,8 +85,8 @@ impl Args {
     }
 
     /// Gets the nth argument (including the executable name).
-    pub fn nth<'a>(&'a self, index: usize) -> Option<&'a String> {
-        self.args.get(index)
+    pub fn nth<'a>(&'a self, index: usize) -> Option<&'a str> {
+        self.args.get(index).map(|s| s.as_str())
     }
 
     /// Check if the given option name is present.
@@ -95,8 +95,11 @@ impl Args {
     }
     /// Get the value associated with the given option name if
     /// present.
-    pub fn option_value<'a>(&'a self, name: &str) -> Option<&'a String> {
-        self.options.get(name).and_then(|o| o.as_ref())
+    pub fn option_value<'a>(&'a self, name: &str) -> Option<&'a str> {
+        self.options
+            .get(name)
+            .and_then(|o| o.as_ref())
+            .map(|s| s.as_str())
     }
 }
 
@@ -118,16 +121,13 @@ mod tests {
             ]
             .map(|s| s.to_string()),
         );
-        assert_eq!(Some(&"exec".to_string()), args.nth(0));
-        assert_eq!(Some(&"arg1".to_string()), args.nth(1));
-        assert_eq!(Some(&"arg2".to_string()), args.nth(2));
-        assert_eq!(Some(&"arg3".to_string()), args.nth(3));
+        assert_eq!(Some("exec"), args.nth(0));
+        assert_eq!(Some("arg1"), args.nth(1));
+        assert_eq!(Some("arg2"), args.nth(2));
+        assert_eq!(Some("arg3"), args.nth(3));
         assert_eq!(None, args.nth(4));
 
-        assert_eq!(
-            Some(&"option0_value".to_string()),
-            args.option_value("option0")
-        );
+        assert_eq!(Some("option0_value"), args.option_value("option0"));
         assert!(args.has_option("o"));
     }
 }
