@@ -1,21 +1,20 @@
-///! A simple command-line argument helper for parsing positional
-/// arguments and options.
 use std::{collections::HashMap, env};
 
-/// Build the `Args` object associated with the arguments
+///! A simple cli argument parser.
+
+/// Build the [`Args`] object associated with the arguments
 /// that the program was started with.
 ///
 /// ```
-/// # use valargs::Args;
 /// # fn main() {
-/// let args = Args::parse();
+/// let args = valargs::parse();
 /// if args.has_option("nevergonnaletyoudown") {
 ///     println!("got rickrolled");
 /// }
 /// # }
 /// ```
 pub fn parse() -> Args {
-    Args::parse()
+    Args::parse_raw(&env::args().collect::<Vec<_>>())
 }
 
 /// A struct representing parsed command-line arguments.
@@ -23,22 +22,21 @@ pub fn parse() -> Args {
 /// #### Example:
 ///
 /// ```
-/// # use valargs::Args;
 /// # fn main() {
-/// let args = Args::parse();
+/// let args = valargs::parse();
 ///
 /// if let Some(cat_name) = args.nth(1) {
 ///     println!("the cat's name is {}", cat_name);
 /// }
 ///
 /// if args.has_option("orange") {
-///     println!("the cat is an orange cat")
+///     println!("the cat is an orange cat");
 /// }
 ///
-/// if let Some(favorite_food) = args.option_value("favorite-food") {
-///     println!("the cat likes {} a lot", favorite_food)
+/// if let Some(favorite_food) = args.option_value("fav-food") {
+///     println!("the cat likes {} a lot", favorite_food);
 /// } else {
-///     println!("no information about the cat's favorite food...")
+///     println!("no information about the cat's favorite food...");
 /// }
 /// # }
 /// ```
@@ -49,20 +47,48 @@ pub struct Args {
 }
 
 impl Args {
-    /// Build the `Args` object associated with the arguments
-    /// that the program was started with.
+    /// Gets the nth argument (including the executable name).
+    ///
+    /// #### Example:
     ///
     /// ```
-    /// # use valargs::Args;
-    /// # fn main() {
-    /// let args = Args::parse();
-    /// if args.has_option("nevergonnaletyoudown") {
-    ///     println!("got rickrolled");
+    /// let args = valargs::parse();
+    ///
+    /// let _ = args.nth(0); // executable name
+    /// let command = args.nth(1); // first argument
+    ///
+    /// match command {
+    ///   Some("hello") => {
+    ///     let name = args.nth(2); // second argument
+    ///
+    ///     if let Some(name) = name {
+    ///       println!("hello {} !!", name);
+    ///     } else {
+    ///       println!("hello !!");
+    ///     }
+    ///   }
+    ///   Some(_) => println!("unknown command"),
+    ///   None => {
+    ///     println!("please provide a command");
+    ///   }
     /// }
-    /// # }
     /// ```
-    pub fn parse() -> Args {
-        Args::parse_raw(&env::args().collect::<Vec<_>>())
+    pub fn nth<'a>(&'a self, index: usize) -> Option<&'a str> {
+        self.args.get(index).map(|s| s.as_str())
+    }
+
+    /// Check if the given option name is present.
+    pub fn has_option(&self, option_name: &str) -> bool {
+        self.options.contains_key(option_name)
+    }
+
+    /// Get the value associated with the given option name
+    /// if present.
+    pub fn option_value<'a>(&'a self, option_name: &str) -> Option<&'a str> {
+        self.options
+            .get(option_name)
+            .and_then(|o| o.as_ref())
+            .map(|s| s.as_str())
     }
 
     fn parse_raw(raw_args: &[String]) -> Args {
@@ -98,24 +124,6 @@ impl Args {
         }
 
         Args { args, options }
-    }
-
-    /// Gets the nth argument (including the executable name).
-    pub fn nth<'a>(&'a self, index: usize) -> Option<&'a str> {
-        self.args.get(index).map(|s| s.as_str())
-    }
-
-    /// Check if the given option name is present.
-    pub fn has_option(&self, name: &str) -> bool {
-        self.options.contains_key(name)
-    }
-    /// Get the value associated with the given option name if
-    /// present.
-    pub fn option_value<'a>(&'a self, name: &str) -> Option<&'a str> {
-        self.options
-            .get(name)
-            .and_then(|o| o.as_ref())
-            .map(|s| s.as_str())
     }
 }
 
